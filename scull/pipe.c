@@ -31,7 +31,7 @@
 #include <linux/sched/signal.h>
 #include <linux/seq_file.h>
 
-#include "proc_ops_version.h"
+#include "../include/proc_ops_version.h"
 
 #include "scull.h"		/* local definitions */
 
@@ -311,7 +311,7 @@ static struct file_operations scullpipe_proc_ops = {
  */
 struct file_operations scull_pipe_fops = {
 	.owner =	THIS_MODULE,
-	.llseek =	no_llseek,
+	.llseek =	noop_llseek,
 	.read =		scull_p_read,
 	.write =	scull_p_write,
 	.poll =		scull_p_poll,
