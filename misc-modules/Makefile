@@ -1,35 +1,31 @@
+# Optional debugging flags
+EXTRA_CFLAGS += -O2
 
-# To build modules outside of the kernel tree, we run "make"
-# in the kernel source tree; the Makefile these then includes this
-# Makefile once again.
-# This conditional selects whether we are being included from the
-# kernel Makefile or not.
+# Include path for headers (only used when manually building)
+LDDINC := $(PWD)/../include
 
-LDDINC=$(PWD)/../include
+#----------------------------------------------------------------------
+# When built from within the kernel (Buildroot path)
+#----------------------------------------------------------------------
+ifneq ($(KERNELRELEASE),)
+# List of all module object files to build
+obj-m := hello.o hellop.o seq.o jiq.o sleepy.o complete.o \
+         silly.o faulty.o kdatasize.o kdataalign.o jit.o
 
-ifeq ($(KERNELRELEASE),)
+#----------------------------------------------------------------------
+# When built manually (developer convenience)
+#----------------------------------------------------------------------
+else
 
-    # Assume the source tree is where the running kernel was built
-    # You should set KERNELDIR in the environment if it's elsewhere
-    KERNELDIR ?= /lib/modules/$(shell uname -r)/build
-    # The current directory is passed to sub-makes as argument
-    PWD := $(shell pwd)
+KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+PWD := $(shell pwd)
 
 modules:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
 
-modules_install:
-	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules_install
-
 clean:
-	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions *.mod modules.order *.symvers
+	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions modules.order *.symvers
 
-.PHONY: modules modules_install clean
+.PHONY: modules clean
 
-else
-    # called from kernel build system: just declare what our modules are
-    obj-m := hello.o hellop.o seq.o jiq.o sleepy.o complete.o \
-             silly.o faulty.o kdatasize.o kdataalign.o jit.o
 endif
-
-
